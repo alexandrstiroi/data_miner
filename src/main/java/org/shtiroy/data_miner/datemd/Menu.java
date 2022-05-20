@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.shtiroy.data_miner.datemd.service.InfoBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.InputMismatchException;
@@ -14,6 +15,8 @@ public class Menu {
     private static final Logger LOGGER = LogManager.getLogger(Menu.class.getName());
     @Autowired
     private InfoBaseService infoBaseService;
+    @Value("count.company")
+    private int count;
 
     public void startMenu(){
         LOGGER.info("start main menu");
@@ -44,7 +47,7 @@ public class Menu {
                         }
                         break;
                     case 2:
-                        infoBaseService.getJson(3);
+                        infoBaseService.getJson(count);
                         break;
                     default:
                         System.out.println("Error number insert");
