@@ -15,8 +15,8 @@ public class Menu {
     private static final Logger LOGGER = LogManager.getLogger(Menu.class.getName());
     @Autowired
     private InfoBaseService infoBaseService;
-    @Value("count.company")
-    private int count;
+    @Value("${count.company}")
+    private Integer count;
 
     public void startMenu(){
         LOGGER.info("start main menu");
