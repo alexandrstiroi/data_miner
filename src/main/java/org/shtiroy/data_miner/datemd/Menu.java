@@ -26,6 +26,7 @@ public class Menu {
                 System.out.println("Menu");
                 System.out.println("1. start parse InfoBase");
                 System.out.println("2. start parse InfoBase json");
+                System.out.println("3. start parse InfoBase json");
                 System.out.println("0. exit");
                 System.out.print("Insert menu number ");
                 String insertStr = scanner.next();
@@ -48,6 +49,9 @@ public class Menu {
                         break;
                     case 2:
                         infoBaseService.getJson(count);
+                        break;
+                    case 3:
+                        infoBaseService.parseFromFile();
                         break;
                     default:
                         System.out.println("Error number insert");

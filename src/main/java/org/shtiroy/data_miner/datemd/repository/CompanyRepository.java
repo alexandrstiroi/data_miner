@@ -18,4 +18,5 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             " fetch first ?1 rows only",
             nativeQuery = true)
     List<Company> findAllActiveCompany(Integer limit);
+    Company findByIdno(String idno);
 }

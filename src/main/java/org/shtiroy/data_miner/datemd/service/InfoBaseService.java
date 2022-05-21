@@ -2,6 +2,7 @@ package org.shtiroy.data_miner.datemd.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.postgresql.util.PGobject;
 import org.shtiroy.data_miner.datemd.exception.ParseExcelError;
 import org.shtiroy.data_miner.datemd.entity.Company;
 import org.shtiroy.data_miner.datemd.entity.CompanyJSON;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
+import java.io.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,19 @@ public class InfoBaseService {
     private CompanyRepository companyRepository;
     @Autowired
     private CompanyJSONRepository companyJSONRepository;
+
+    private CompanyJSON getFromData2b(Company company) throws DataAccessException{
+        UrlParse urlParse = new UrlParse();
+        String url = "https://www.data2b.md/api/companies/" + company.getIdno() + "/";
+        String strJson = (String) urlParse.methodGet(url);
+        CompanyJSON companyJSON = new CompanyJSON();
+        companyJSON.setIdno(company.getIdno());
+        companyJSON.setCompanyData(strJson);
+        companyJSON.setCreateTs(new Timestamp(System.currentTimeMillis()));
+        companyJSON.setResource("data2b.md");
+        return companyJSON;
+    }
+
     /**
      * Вставка данных в таблицу с фирмами.
      * @param fileName - имя файла для парсинга.
@@ -71,7 +86,7 @@ public class InfoBaseService {
         return true;
     }
 
-    public boolean getJson(int count){
+    public boolean getJson(int count) {
         LOGGER.info("get json from InfoBase");
         List<Company> companies;
         try {
@@ -80,33 +95,47 @@ public class InfoBaseService {
             LOGGER.error("Error get companies: " + ex.getMessage());
             return false;
         }
-        UrlParse urlParse = new UrlParse();
         for (Company company : companies){
             LOGGER.info("get company: " + company.toString());
             if (company.getIdno().length() > 11){
-                String url = "https://www.data2b.md/api/companies/" + company.getIdno() + "/";
-                String strJson = (String) urlParse.methodGet(url);
+                CompanyJSON companyJSON = getFromData2b(company);
+                companyJSONRepository.saveCompany(companyJSON.getIdno(),companyJSON.getCreateTs(),
+                        companyJSON.getCompanyData().toString(),companyJSON.getResource());
                 try{
                     Thread.sleep(30000);
                 } catch (InterruptedException ex){
                     LOGGER.error(ex.getMessage());
                 }
-                if (strJson == null){
-                    break;
-                }
-                CompanyJSON companyJSON = new CompanyJSON();
-                companyJSON.setIdno(company.getIdno());
-                companyJSON.setCompanyData(strJson);
-                companyJSON.setCreateTs(new Timestamp(System.currentTimeMillis()));
-                try {
-                    //companyJSONRepository.save(companyJSON);
-                    companyJSONRepository.saveCompany(companyJSON.getIdno(),companyJSON.getCreateTs(),companyJSON.getCompanyData());
-                } catch (DataAccessException ex){
-                    LOGGER.error("Error insert company json:" + ex.getMessage());
-                    return false;
-                }
             }
         }
         return true;
+    }
+
+    public void parseFromFile(){
+        try {
+            List<String> idnoList = new ArrayList<>();
+            BufferedReader br
+                     = new BufferedReader(new FileReader("C:/Users/User/Downloads/kongo/kongo.txt"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                idnoList.add(line);
+            }
+            int i = 0;
+            for (String company : idnoList){
+                i++;
+                LOGGER.info("get company: " + i + " " + company);
+                if (company.length() > 11){
+                    CompanyJSON companyJSON = getFromData2b(companyRepository.findByIdno(company));
+                    try {
+                        companyJSONRepository.saveCompany(companyJSON.getIdno(),companyJSON.getCreateTs(),
+                                companyJSON.getCompanyData(),companyJSON.getResource());
+                    } catch (DataAccessException ex){
+                        LOGGER.error("Error insert company json:" + ex.getMessage());
+                    }
+                }
+            }
+        } catch(IOException ex){
+            LOGGER.info("Error " + ex.getMessage());
+        }
     }
 }

@@ -1,7 +1,5 @@
 package org.shtiroy.data_miner.datemd.entity;
 
-import org.hibernate.annotations.Type;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -16,18 +14,27 @@ public class CompanyJSON {
     private String idno;
     @Column(name = "create_ts")
     private Timestamp createTs;
-
-    //@Type(type = "jsonb")
-    @Column(name = "company_data", columnDefinition = "jsonb")
+    @Column(name = "company_data")
     private String companyData;
+    @Column(name = "resource")
+    private String resource;
+
+    public String getResource() {
+        return resource;
+    }
+
+    public void setResource(String resource) {
+        this.resource = resource;
+    }
 
     public CompanyJSON() {
     }
 
-    public CompanyJSON(String idno, Timestamp createTs, String companyData) {
+    public CompanyJSON(String idno, Timestamp createTs, String companyData, String resource) {
         this.idno = idno;
         this.createTs = createTs;
         this.companyData = companyData;
+        this.resource = resource;
     }
 
     public Integer getCompanyJsonId() {
@@ -54,7 +61,7 @@ public class CompanyJSON {
         this.createTs = createTs;
     }
 
-    public String getCompanyData() {
+    public Object getCompanyData() {
         return companyData;
     }
 

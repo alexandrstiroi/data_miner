@@ -14,8 +14,8 @@ public interface CompanyJSONRepository extends JpaRepository<CompanyJSON, Intege
 
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query(value = "INSERT INTO working_data.t_company_json(idno, create_ts, company_data) " +
-            "values(?1, ?2, to_json(?3))",
+    @Query(value = "INSERT INTO working_data.t_company_json(idno, create_ts, company_data, resource) " +
+            "values(?1, ?2, cast(?3 as json), ?4)",
         nativeQuery = true)
-    void saveCompany(String idno, Timestamp create_ts, String company_data);
+    void saveCompany(String idno, Timestamp create_ts, Object company_data, String resource);
 }
