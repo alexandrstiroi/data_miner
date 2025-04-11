@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: v1.0__create_table_tender
+      author: Shtiroy Aleksandr
+      changes:
+        sqlFile:
+          path: db/changelog/changes/v1.0__create_table_tender.sql
+          endDelimiter: \nGO
+          splitStatements: true
+          dbms: postgresql
+  - changeSet:
+      id: v1.0__create_table_tender_detail
+      author: Shtiroy Aleksandr
+      changes:
+        sqlFile:
+          path: db/changelog/changes/v1.0__create_table_tender_detail.sql
