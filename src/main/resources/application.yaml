@@ -6,7 +6,7 @@ app:
 
 spring:
   datasource:
-    url: jdbc:postgresql://192.168.88.90:5432/data_miner
+    url: jdbc:postgresql://${DB_PATH}/data_miner
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   liquibase.enabled: true
