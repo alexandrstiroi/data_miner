@@ -19,4 +19,6 @@ public interface TenderRepository extends JpaRepository<TenderInfo, Integer> {
     @Modifying(clearAutomatically = true)
     @Query(value = "update tender set value = ?1, date = ?2 where url = ?3 and name = ?4", nativeQuery = true)
     void updateTender(String value,String date, String url, String name);
+
+    List<TenderInfo> findByCustomerIdIsNull();
 }

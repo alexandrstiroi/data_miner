@@ -19,11 +19,13 @@ public class TenderInfo {
     private String value;
     private String date;
     private String uniqueId;
+    private String customerId;
 
     public TenderInfo() {
     }
 
-    public TenderInfo(Integer id, String country, String site, String name, String url, String customerName, String value, String date, String uniqueId) {
+    public TenderInfo(Integer id, String country, String site, String name, String url, String customerName, String value,
+                      String date, String uniqueId, String customerId) {
         this.id = id;
         this.country = country;
         this.site = site;
@@ -33,6 +35,7 @@ public class TenderInfo {
         this.value = value;
         this.date = date;
         this.uniqueId = uniqueId;
+        this.customerId = customerId;
     }
 
     public Integer getId() {
@@ -105,5 +108,13 @@ public class TenderInfo {
 
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 }

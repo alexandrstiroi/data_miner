@@ -21,6 +21,7 @@ public class TenderDetail {
     private BigDecimal amount;
     private String currency;
     private String date;
+    private String costumerId;
     private List<Lot> lots;
 
     public TenderDetailDto toDto(){

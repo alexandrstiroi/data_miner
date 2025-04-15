@@ -29,6 +29,12 @@ public class AchizitiiMDDetailParser implements SiteDetailParse {
                         detail.setUniqueId(element.select("a").text());
                         detail.setUrls(element.select("a").attr("href"));
                         break;
+                    case "Фискальный код/IDNO" :
+                        detail.setCostumerId(element.select("a").text());
+                        break;
+                    case "Codul fiscal/IDNO" :
+                        detail.setCostumerId(element.select("a").text());
+                        break;
                 }
             }
             elements = doc.getElementsByClass("prog__etap");

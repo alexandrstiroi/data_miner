@@ -6,16 +6,18 @@ public class Tender {
     private String customerName;
     private String value;
     private String date;
+    private String customerId;
 
     public Tender() {
     }
 
-    public Tender(String name, String url, String customerName, String value, String date) {
+    public Tender(String name, String url, String customerName, String value, String date, String customerId) {
         this.name = name;
         this.url = url;
         this.customerName = customerName;
         this.value = value;
         this.date = date;
+        this.customerId = customerId;
     }
 
     public String getName() {
@@ -56,5 +58,13 @@ public class Tender {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 }

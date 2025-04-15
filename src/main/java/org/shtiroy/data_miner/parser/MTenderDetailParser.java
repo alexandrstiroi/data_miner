@@ -11,6 +11,7 @@ import org.shtiroy.data_miner.model.*;
 import org.shtiroy.data_miner.util.JSONValue;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
@@ -31,13 +32,14 @@ public class MTenderDetailParser implements SiteDetailParse{
     public TenderDetail parse(String url) {
         log.info("Get Tender detail MTender");
         TenderDetail detail = new TenderDetail();
-        String response = webClient.get()
-                .uri(url)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-        log.debug("Response MTender  - {}", response);
-        try{
+        String response = "";
+        try {
+            response = webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            log.debug("Response MTender  - {}", response);
             ObjectMapper mapper = new ObjectMapper();
             ArrayNode records = mapper.readTree(response).withArrayProperty("records");
             int size = records.size();
@@ -57,7 +59,7 @@ public class MTenderDetailParser implements SiteDetailParse{
                 }
             }
             detail.setUrls(url);
-        } catch (JsonProcessingException ex){
+        } catch (WebClientResponseException | JsonProcessingException ex){
             log.error("Ошибка {}", ex.getMessage());
             throw new ParserException("Ошибка парсинга " + ex.getMessage());
         }

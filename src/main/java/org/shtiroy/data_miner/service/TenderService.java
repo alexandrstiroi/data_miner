@@ -57,6 +57,7 @@ public class TenderService {
             detail = parser.parse(tender.getUrl());
             tender.setUniqueId(detail.getUniqueId());
             tender.setDate(detail.getDate());
+            tender.setCustomerId(detail.getCostumerId());
             detail = mParser.parse("https://public.mtender.gov.md/tenders/"+detail.getUniqueId());
             tenderDetailRepository.save(detail.toDto());
             tenderRepository.save(tender);
