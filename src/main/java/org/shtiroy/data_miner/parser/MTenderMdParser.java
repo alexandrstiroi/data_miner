@@ -7,7 +7,7 @@ import java.util.List;
 
 public class MTenderMdParser implements SiteParser{
     @Override
-    public List<Tender> parse(String url, int pageCount) throws ParserException {
+    public List<Tender> parse(String url) throws ParserException {
         return List.of();
     }
 }

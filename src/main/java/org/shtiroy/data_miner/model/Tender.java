@@ -1,5 +1,7 @@
 package org.shtiroy.data_miner.model;
 
+import java.time.LocalDateTime;
+
 public class Tender {
     private String name;
     private String url;
@@ -7,17 +9,20 @@ public class Tender {
     private String value;
     private String date;
     private String customerId;
+    private LocalDateTime createdAt;
 
     public Tender() {
     }
 
-    public Tender(String name, String url, String customerName, String value, String date, String customerId) {
+    public Tender(String name, String url, String customerName, String value, String date, String customerId,
+                  LocalDateTime createdAt) {
         this.name = name;
         this.url = url;
         this.customerName = customerName;
         this.value = value;
         this.date = date;
         this.customerId = customerId;
+        this.createdAt = createdAt;
     }
 
     public String getName() {
@@ -66,5 +71,13 @@ public class Tender {
 
     public void setCustomerId(String customerId) {
         this.customerId = customerId;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

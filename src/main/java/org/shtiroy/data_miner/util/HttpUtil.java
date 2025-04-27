@@ -6,7 +6,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.shtiroy.data_miner.model.Tender;
-import org.shtiroy.data_miner.model.TenderDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +13,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 @Slf4j
 public class HttpUtil {
@@ -43,7 +45,6 @@ public class HttpUtil {
         return null;
     }
 
-
     private static Tender getTender(Element element) {
         Tender tender = new Tender();
         Element title = element.getElementsByClass("tender__list__item__title").first();
@@ -55,5 +56,71 @@ public class HttpUtil {
         tender.setValue(element.getElementsByClass("tender__list__item__price").text());
         tender.setDate(element.getElementsByClass("tender__list__item__info__date").text());
         return tender;
+    }
+
+    /**
+     * Извлекает список всех абсолютных URL страниц пагинации, включая недостающие.
+     *
+     * @param baseUrl Базовый адрес (например: "https://example.com")
+     * @return Отсортированный список абсолютных URL всех страниц
+     */
+    public static List<String> extractPaginationUrls(String baseUrl) {
+        log.info("URL для извлечения {}", baseUrl);
+        Elements pageLinks = null;
+        try {
+            Document doc = Jsoup.connect(baseUrl).get();
+            pageLinks = doc.select("nav ul.pagination a[href]");
+        } catch (IOException exception){
+            log.error("JSOUP {}",exception.getMessage());
+        }
+
+        TreeMap<Integer, String> pageMap = new TreeMap<>();
+        String pageUrlTemplate = null;
+
+        for (Element link : pageLinks) {
+            String text = link.text().trim();
+            String href = link.absUrl("href");
+
+            try {
+                int pageNum = Integer.parseInt(text);
+                pageMap.put(pageNum, href);
+
+                // Сохраняем шаблон при первой возможности
+                if (pageUrlTemplate == null && href.contains("page=")) {
+                    int index = href.indexOf("page=");
+                    pageUrlTemplate = href.substring(0, index + "page=".length());
+                }
+
+            } catch (NumberFormatException ignored) {
+                // Пропускаем "Назад", "Вперед", и т.п.
+            }
+        }
+
+        if (pageUrlTemplate == null) {
+            log.error("Не удалось определить шаблон URL для генерации ссылок.");
+            return List.of(baseUrl);
+        }
+
+        // Генерация недостающих страниц
+        Map<Integer, String> generated = new HashMap<>();
+        List<Integer> allPages = new ArrayList<>(pageMap.keySet());
+
+        for (int i = 0; i < allPages.size() - 1; i++) {
+            int current = allPages.get(i);
+            int next = allPages.get(i + 1);
+            if (next - current > 1) {
+                for (int missing = current + 1; missing < next; missing++) {
+                    String genUrl = pageUrlTemplate + missing;
+                    generated.put(missing, genUrl);
+                }
+            }
+        }
+
+        // Объединение всех ссылок
+        TreeMap<Integer, String> allCombined = new TreeMap<>();
+        allCombined.putAll(pageMap);
+        allCombined.putAll(generated);
+
+        return new ArrayList<>(allCombined.values());
     }
 }

@@ -2,13 +2,15 @@ package org.shtiroy.data_miner.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.shtiroy.data_miner.model.TenderDetail;
 import org.shtiroy.data_miner.service.TenderService;
 import org.shtiroy.data_miner.service.schedule.ScheduledTasks;
+import org.shtiroy.data_miner.util.DateUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 
 @RestController
 public class TenderController {
@@ -31,5 +33,13 @@ public class TenderController {
     public ResponseEntity<Object> getTenderInfo(@RequestBody String tenderInfo){
         LOGGER.info("/tender/info - request | {}", tenderInfo);
         return ResponseEntity.ok(tenderService.getTenderDetail(Integer.valueOf(tenderInfo)));
+    }
+
+    @PostMapping("/tender/get/new")
+    public ResponseEntity<Object> getTenderGetNew(@RequestBody String dateTime){
+        LOGGER.info("/tender/get/new | request {}", dateTime);
+        LocalDateTime date = DateUtil.strToDateTime(dateTime);
+
+        return ResponseEntity.ok(tenderService.getNew(date));
     }
 }

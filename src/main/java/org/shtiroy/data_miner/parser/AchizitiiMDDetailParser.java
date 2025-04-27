@@ -38,15 +38,42 @@ public class AchizitiiMDDetailParser implements SiteDetailParse {
                 }
             }
             elements = doc.getElementsByClass("prog__etap");
-            StringBuilder period = new StringBuilder();
-            for (Element element : elements){
-                period.append(element.getElementsByClass("prog__title prog__title__tender").first().text()).append("\n");
-                period.append(element.getElementsByClass("prog__date__text").first().text()).append("\n");
-            }
-            detail.setDate(period.toString());
+            detail.setDate(extractStagePeriods(elements));
         } catch (IOException exception) {
             log.info("Ошибка парсинга url {}, ошибка {}", url, exception.getMessage());
         }
         return detail;
+    }
+
+    /**
+     * Извлекает все этапы тендера и их временные промежутки в читаемом виде.
+     *
+     * @param etapBlocks HTML с блоками этапов
+     * @return Строка, где каждый этап и его даты указаны с новой строки
+     */
+    private static String extractStagePeriods(Elements etapBlocks) {
+        StringBuilder result = new StringBuilder();
+        for (Element etap : etapBlocks) {
+            // Название этапа
+            Element titleEl = etap.selectFirst(".prog__title");
+            if (titleEl == null) continue;
+            String title = titleEl.text().trim();
+            // Блок с датами
+            Element dateTextEl = etap.selectFirst(".prog__date__text");
+            if (dateTextEl == null) continue;
+            String dateText = dateTextEl.text().trim();
+            if (dateText.isEmpty() || dateText.toLowerCase().contains("не будет использоваться")) {
+                continue;
+            }
+            // Очистка лишнего
+            String cleanedDate = dateText
+                    .replaceAll("с\\s*", "с ")
+                    .replaceAll("\\s*по\\s*", "по ")
+                    .replaceAll("осталось \\d+ дней", "") // убираем "осталось N дней"
+                    .trim();
+            // Формируем строку для одного этапа
+            result.append(title).append(": ").append(cleanedDate).append("\n");
+        }
+        return result.toString().trim();
     }
 }

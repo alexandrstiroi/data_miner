@@ -5,6 +5,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "tender", schema = "public")
 public class TenderInfo {
@@ -20,12 +23,13 @@ public class TenderInfo {
     private String date;
     private String uniqueId;
     private String customerId;
+    private LocalDateTime createdAt;
 
     public TenderInfo() {
     }
 
     public TenderInfo(Integer id, String country, String site, String name, String url, String customerName, String value,
-                      String date, String uniqueId, String customerId) {
+                      String date, String uniqueId, String customerId, LocalDateTime createdAt) {
         this.id = id;
         this.country = country;
         this.site = site;
@@ -36,6 +40,7 @@ public class TenderInfo {
         this.date = date;
         this.uniqueId = uniqueId;
         this.customerId = customerId;
+        this.createdAt = createdAt;
     }
 
     public Integer getId() {
@@ -116,5 +121,13 @@ public class TenderInfo {
 
     public void setCustomerId(String customerId) {
         this.customerId = customerId;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

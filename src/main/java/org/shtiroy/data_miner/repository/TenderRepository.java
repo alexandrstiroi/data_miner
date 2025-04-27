@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -17,8 +18,10 @@ public interface TenderRepository extends JpaRepository<TenderInfo, Integer> {
 
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query(value = "update tender set value = ?1, date = ?2 where url = ?3 and name = ?4", nativeQuery = true)
-    void updateTender(String value,String date, String url, String name);
+    @Query(value = "update tender set value = ?1 where url = ?2 and name = ?3", nativeQuery = true)
+    void updateTender(String value, String url, String name);
 
     List<TenderInfo> findByCustomerIdIsNull();
+
+    List<TenderInfo> findByCreatedAtAfter(LocalDateTime createdAt);
 }

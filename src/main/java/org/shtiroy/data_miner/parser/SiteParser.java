@@ -6,5 +6,5 @@ import org.shtiroy.data_miner.model.Tender;
 import java.util.List;
 
 public interface SiteParser {
-    List<Tender> parse(String url, int pageCount) throws ParserException;
+    List<Tender> parse(String url) throws ParserException;
 }

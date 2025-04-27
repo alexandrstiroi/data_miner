@@ -12,7 +12,6 @@ import org.shtiroy.data_miner.util.JSONValue;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -53,8 +52,8 @@ public class MTenderDetailParser implements SiteDetailParse{
                     log.info("-EV- {}", ocid);
                     detail.setLots(parseLots(tenderInfo));
                 }
-                if (!ocid.contains("-EV-") & !ocid.contains("-PN-")) {
-                    log.info("!-EV- !-PN- {}", ocid);
+                if (!ocid.contains("-EV-") & !ocid.contains("-PN-") & !ocid.contains("-AC-")) {
+                    log.info("!-EV- !-PN- !-AC- {}", ocid);
                     parseTenderInfo(detail, tenderInfo);
                 }
             }
@@ -70,7 +69,11 @@ public class MTenderDetailParser implements SiteDetailParse{
         detail.setUniqueId(json.get("ocid").asText());
         detail.setCategory(json.get("compiledRelease").get("tender").get("classification").get("id").asText());
         detail.setCategoryName(json.get("compiledRelease").get("tender").get("classification").get("description").asText());
-        detail.setAmount(BigDecimal.valueOf(json.get("compiledRelease").get("tender").get("value").get("amount").asDouble()));
+        if (json.get("compiledRelease").get("tender").get("value").get("amount").isNull()){
+            detail.setAmount(null);
+        } else {
+            detail.setAmount(BigDecimal.valueOf(json.get("compiledRelease").get("tender").get("value").get("amount").asDouble()));
+        }
         detail.setCurrency(json.get("compiledRelease").get("tender").get("value").get("currency").asText());
     }
 

@@ -5,20 +5,25 @@ import org.shtiroy.data_miner.entity.TenderInfo;
 import org.shtiroy.data_miner.parser.AchizitiiMdParser;
 import org.shtiroy.data_miner.repository.TenderRepository;
 import org.shtiroy.data_miner.service.TenderService;
+import org.shtiroy.data_miner.util.HttpUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Component
 @Slf4j
 public class ScheduledTasks {
 
-    private final Integer ACHIZITII_PAGE_COUNT = 2666;
-    private final Integer ACHIZITII_UPDATE_PAGE_COUNT = 3;
+    private final Integer ACHIZITII_UPDATE_PAGE_COUNT = 20;
     private final AchizitiiMdParser achizitiiMdParser;
     private final TenderRepository tenderRepository;
     private final TenderService tenderService;
+    @Value("${app.config.achizitiimd.tenderListUrl}")
+    private String baseUrl;
 
     public ScheduledTasks(AchizitiiMdParser achizitiiMdParser, TenderRepository tenderRepository, TenderService tenderService){
         this.achizitiiMdParser = achizitiiMdParser;
@@ -28,7 +33,13 @@ public class ScheduledTasks {
 
     @Scheduled(cron = "${app.config.achizitiimd.cron}")
     public void getNewAchizitiimd(){
-        achizitiiMdParser.parse("https://achizitii.md/ru/public/tender/list?page=", ACHIZITII_UPDATE_PAGE_COUNT);
+        List<String> urlList = HttpUtil.extractPaginationUrls(baseUrl);
+        urlList.stream().
+                limit(urlList.size()>ACHIZITII_UPDATE_PAGE_COUNT ? ACHIZITII_UPDATE_PAGE_COUNT : urlList.size())
+                .map(achizitiiMdParser::parse)
+                .flatMap(Collection::stream)
+                .peek(elem -> elem.setCreatedAt(LocalDateTime.now()))
+                .forEach(tenderService::saveAchizitii);
     }
 
     @Scheduled(cron = "${app.config.achizitiimd.update}")
@@ -39,8 +50,17 @@ public class ScheduledTasks {
                 .forEach(tenderService::getTenderDetail);
     }
 
-    @Scheduled(cron = "${app.config.achizitiimd.cron}")
     public void getUpdateAchizitiimd(){
-        achizitiiMdParser.parse("https://achizitii.md/ru/public/tender/list?page=", ACHIZITII_UPDATE_PAGE_COUNT);
+        List<String> urlList = HttpUtil.extractPaginationUrls(baseUrl);
+        urlList.stream().
+                limit(urlList.size()>ACHIZITII_UPDATE_PAGE_COUNT ? ACHIZITII_UPDATE_PAGE_COUNT : urlList.size())
+                .map(achizitiiMdParser::parse)
+                .flatMap(Collection::stream)
+                .peek(elem -> elem.setCreatedAt(LocalDateTime.now()))
+                .forEach(tenderService::saveAchizitii);
+        List<TenderInfo> list = tenderRepository.findByCustomerIdIsNull();
+        list.stream()
+                .map(TenderInfo::getId)
+                .forEach(tenderService::getTenderDetail);
     }
 }

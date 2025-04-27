@@ -1,9 +1,10 @@
 app:
   config:
     achizitiimd:
-      cron: 0 0 8-20 * * *
-      update: 0 30 8-20 * * *
-      tenderListUrl: "https://achizitii.md/ru/public/tender/list?page="
+      cron: 0 0 8-18 * * 1-5
+      update: 0 15 8-18 * * 1-5
+      tenderListUrl: "https://achizitii.md/ru/public/tender/list?page=None"
+      customerTenderList: "https://achizitii.md/ru/organization/idno/"
 
 spring:
   datasource:

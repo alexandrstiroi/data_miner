@@ -7,6 +7,7 @@ import org.shtiroy.data_miner.entity.TenderInfo;
 import org.shtiroy.data_miner.exception.ResourceNotFoundException;
 import org.shtiroy.data_miner.model.Tender;
 import org.shtiroy.data_miner.model.TenderDetail;
+import org.shtiroy.data_miner.model.TenderDto;
 import org.shtiroy.data_miner.parser.AchizitiiMDDetailParser;
 import org.shtiroy.data_miner.parser.MTenderDetailParser;
 import org.shtiroy.data_miner.repository.TenderDetailRepository;
@@ -14,7 +15,10 @@ import org.shtiroy.data_miner.repository.TenderRepository;
 import org.shtiroy.data_miner.util.Country;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TenderService {
@@ -33,18 +37,18 @@ public class TenderService {
     }
 
     public boolean saveAchizitii(Tender tender){
-        boolean result = false;
         log.info("Обработка тендера {}", tender.getCustomerName());
         TenderInfo info = getTenderFromAchizitii(tender);
         try {
             if (tenderRepository.findByNameAndUrl(info.getName(), tender.getUrl()).isEmpty()) {
                 tenderRepository.save(info);
             } else {
-                tenderRepository.updateTender(info.getValue(), info.getDate(), info.getUrl(), info.getName());
+                tenderRepository.updateTender(info.getValue(), info.getUrl(), info.getName());
             }
         } catch (Exception ex){
             log.error("ERROR update or save element {}", info);
             log.error("ERROR detail {}", ex.getMessage());
+            return false;
         }
         return true;
     }
@@ -64,8 +68,25 @@ public class TenderService {
         } else {
             detail = tenderDetailRepository.findByUniqueId(tender.getUniqueId()).stream()
                     .findFirst().map(TenderDetailDto::toModel).orElse(null);
+            if (detail != null){
+                detail.setName(tender.getName());
+                detail.setCostumerId(tender.getCustomerId());
+                detail.setDate(tender.getDate());
+            }
         }
         return detail;
+    }
+
+    public List<TenderDto> getNew(LocalDateTime dateTime){
+        try{
+            return tenderRepository.findByCreatedAtAfter(dateTime)
+                    .stream()
+                    .map(this::process)
+                    .collect(Collectors.toList());
+        } catch (Exception ex){
+            log.error("Не смогли достать новые тендоры");
+            return Collections.emptyList();
+        }
     }
 
     private TenderInfo getTenderFromAchizitii(Tender tender){
@@ -78,7 +99,26 @@ public class TenderService {
             info.setCustomerName(tender.getCustomerName());
             info.setValue(tender.getValue());
             info.setDate(tender.getDate());
+            if (tender.getCreatedAt() != null) {
+                info.setCreatedAt(tender.getCreatedAt());
+            }
         }
         return info;
+    }
+
+    private TenderDto process(TenderInfo tenderInfo){
+        TenderDto result = new TenderDto();
+        result.setId(tenderInfo.getId());
+        result.setName(tenderInfo.getName());
+        result.setUrl(tenderInfo.getUrl());
+        result.setCustomerName(tenderInfo.getCustomerName());
+        result.setCustomerId(tenderInfo.getCustomerId());
+        result.setValue(tenderInfo.getValue());
+        result.setDate(tenderInfo.getDate());
+        result.setUniqueId(tenderInfo.getUniqueId());
+        result.setCategory(tenderDetailRepository.findByUniqueId(tenderInfo.getUniqueId()).stream()
+                .map(TenderDetailDto::getCategory)
+                .findFirst().orElse(""));
+        return result;
     }
 }

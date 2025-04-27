@@ -20,3 +20,27 @@ databaseChangeLog:
       changes:
         sqlFile:
           path: db/changelog/changes/v1.0__alter_table_tender_customer_id.sql
+  - changeSet:
+      id: v1.0__create_table_task_info
+      author: Shtiroy Aleksandr
+      changes:
+        sqlFile:
+          path: db/changelog/changes/v1.0__create_table_task_info.sql
+  - changeSet:
+      id: v1.0__alter_table_tender_created_at
+      author: Shtiroy Aleksandr
+      changes:
+        sqlFile:
+          path: db/changelog/changes/v1.0__alter_table_tender_created_at.sql
+  - changeSet:
+      id: v1.0__create_table_t_category
+      author: Shtiroy Aleksandr
+      changes:
+        sqlFile:
+          path: db/changelog/changes/v1.0__create_table_t_category.sql
+  - changeSet:
+      id: v1.0__data_import_t_category
+      author: Shtiroy Aleksandr
+      changes:
+        sqlFile:
+          path: db/changelog/changes/v1.0__data_import_t_category.sql
