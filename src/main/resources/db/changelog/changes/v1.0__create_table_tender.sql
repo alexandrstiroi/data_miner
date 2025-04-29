@@ -4,6 +4,6 @@ create table if not exists tender(
     site varchar(200),
     name varchar(500),
     url varchar(500),
-    customerName varchar(500),
+    customer_name varchar(500),
     value varchar(500),
     date varchar(500));
