@@ -6,4 +6,5 @@ create table if not exists tender(
     url varchar(500),
     customer_name varchar(500),
     value varchar(500),
-    date varchar(500));
+    date varchar(500),
+    unique_id varchar(500));
