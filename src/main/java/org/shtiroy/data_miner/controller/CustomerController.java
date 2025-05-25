@@ -1,5 +1,6 @@
 package org.shtiroy.data_miner.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.shtiroy.data_miner.entity.TaskInfo;
 import org.shtiroy.data_miner.exception.ParserException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
+@Tag(name = "Заказчик", description = "Информация о заказчике")
 public class CustomerController {
     private final TaskInfoService taskInfoService;
     private final CustomerService customerService;

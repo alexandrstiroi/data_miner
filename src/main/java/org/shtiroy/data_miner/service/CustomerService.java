@@ -22,16 +22,19 @@ public class CustomerService {
     private final TenderService tenderService;
     private final TenderRepository tenderRepository;
     private final TaskInfoService taskInfoService;
+    private final TenderAnalysisService tenderAnalysisService;
 
     @Value("${app.config.achizitiimd.customerTenderList}")
     private String baseUrl;
 
     public CustomerService(AchizitiiMdParser achizitiiMdParser, TenderService tenderService,
-                           TenderRepository tenderRepository, TaskInfoService taskInfoService){
+                           TenderRepository tenderRepository, TaskInfoService taskInfoService,
+                           TenderAnalysisService tenderAnalysisService){
         this.achizitiiMdParser = achizitiiMdParser;
         this.tenderRepository = tenderRepository;
         this.tenderService = tenderService;
         this.taskInfoService = taskInfoService;
+        this.tenderAnalysisService = tenderAnalysisService;
     }
 
     public void start(TaskInfo taskInfo){
@@ -70,6 +73,8 @@ public class CustomerService {
             }
             log.info("Обработка заказчика {} завершена успешно", taskInfo.getTaskValue());
             taskInfoService.updateTaskStatus(taskInfo, TaskStatusEnum.DOWNLOAD_INFO);
+
+            new Thread(() -> tenderAnalysisService.buildTextReport(taskInfo)).start();
         } catch (Exception e){
             log.error("Фатальная ошибка при обработке заказчика {}", taskInfo.getTaskValue(), e);
             taskInfoService.errorTask(taskInfo);

@@ -24,4 +24,6 @@ public interface TenderRepository extends JpaRepository<TenderInfo, Integer> {
     List<TenderInfo> findByCustomerIdIsNull();
 
     List<TenderInfo> findByCreatedAtAfter(LocalDateTime createdAt);
+
+    List<TenderInfo> findByCustomerId(String customerId);
 }

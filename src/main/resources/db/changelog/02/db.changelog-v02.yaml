@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: v2.0__create_table_customer_analysis
+      author: Shtiroy Aleksandr
+      changes:
+        sqlFile:
+          path: db/changelog/02/v2.0__create_table_customer_analysis.sql
+  - changeSet:
+      id: v2.0__alter_table_t_category_add_parentid
+      author: Shtiroy Aleksandr
+      changes:
+        sqlFile:
+          path: db/changelog/02/v2.0__alter_table_t_category_add_parentid.sql
+  - changeSet:
+      id: v2.0__data_import_t_category
+      author: Shtiroy Aleksandr
+      changes:
+        sqlFile:
+          path: db/changelog/02/v2.0__data_import_t_category.sql

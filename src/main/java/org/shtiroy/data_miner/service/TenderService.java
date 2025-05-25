@@ -77,6 +77,22 @@ public class TenderService {
         return detail;
     }
 
+    public TenderDetail updateTenderDetail(Integer tenderId){
+        TenderInfo tender = tenderRepository.findById(tenderId).orElseThrow(() ->
+                new ResourceNotFoundException("Тендер по id=" + tenderId + " не найден"));
+        TenderDetail detail = null;
+        detail = parser.parse(tender.getUrl());
+        tender.setDate(detail.getDate());
+        detail = mParser.parse("https://public.mtender.gov.md/tenders/"+detail.getUniqueId());
+        detail.setName(tender.getName());
+        detail.setCostumerId(tender.getCustomerId());
+        detail.setDate(tender.getDate());
+        detail.setId(tenderDetailRepository.findByUniqueId(detail.getUniqueId()).stream().map(TenderDetailDto::getId).findFirst().orElse(null));
+        tenderDetailRepository.save(detail.toDto());
+        tenderRepository.save(tender);
+        return detail;
+    }
+
     public List<TenderDto> getNew(LocalDateTime dateTime){
         try{
             return tenderRepository.findByCreatedAtAfter(dateTime)

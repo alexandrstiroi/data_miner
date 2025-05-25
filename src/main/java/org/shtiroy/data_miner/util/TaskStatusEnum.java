@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum TaskStatusEnum {
     START("START","старт"),
     DOWNLOAD_INFO("DOWNLOAD","Скачена информация"),
+    ANALYSIS("ANALYSIS","Анализ заказчика"),
     ERROR("ERROR", "Ошибка при работе таски"),
     DONE("DONE","задача выполнена");
 
