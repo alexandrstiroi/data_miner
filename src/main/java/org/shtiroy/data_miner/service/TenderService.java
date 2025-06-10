@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.shtiroy.data_miner.entity.TenderDetailDto;
 import org.shtiroy.data_miner.entity.TenderInfo;
 import org.shtiroy.data_miner.exception.ResourceNotFoundException;
+import org.shtiroy.data_miner.model.Period;
 import org.shtiroy.data_miner.model.Tender;
 import org.shtiroy.data_miner.model.TenderDetail;
 import org.shtiroy.data_miner.model.TenderDto;
@@ -13,6 +14,7 @@ import org.shtiroy.data_miner.parser.MTenderDetailParser;
 import org.shtiroy.data_miner.repository.TenderDetailRepository;
 import org.shtiroy.data_miner.repository.TenderRepository;
 import org.shtiroy.data_miner.util.Country;
+import org.shtiroy.data_miner.util.DateUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -60,9 +62,10 @@ public class TenderService {
         if (tender.getUniqueId() == null){
             detail = parser.parse(tender.getUrl());
             tender.setUniqueId(detail.getUniqueId());
-            tender.setDate(detail.getDate());
             tender.setCustomerId(detail.getCostumerId());
             detail = mParser.parse("https://public.mtender.gov.md/tenders/"+detail.getUniqueId());
+            tender.setDate(getDataInfo(detail.getPeriod(), detail.getAuctionPeriod()));
+            detail.setDate(getDataInfo(detail.getPeriod(), detail.getAuctionPeriod()));
             tenderDetailRepository.save(detail.toDto());
             tenderRepository.save(tender);
         } else {
@@ -71,7 +74,7 @@ public class TenderService {
             if (detail != null){
                 detail.setName(tender.getName());
                 detail.setCostumerId(tender.getCustomerId());
-                detail.setDate(tender.getDate());
+                detail.setDate(getDataInfo(detail.getPeriod(), detail.getAuctionPeriod()));
             }
         }
         return detail;
@@ -82,11 +85,11 @@ public class TenderService {
                 new ResourceNotFoundException("Тендер по id=" + tenderId + " не найден"));
         TenderDetail detail = null;
         detail = parser.parse(tender.getUrl());
-        tender.setDate(detail.getDate());
         detail = mParser.parse("https://public.mtender.gov.md/tenders/"+detail.getUniqueId());
         detail.setName(tender.getName());
         detail.setCostumerId(tender.getCustomerId());
-        detail.setDate(tender.getDate());
+        detail.setDate(getDataInfo(detail.getPeriod(), detail.getAuctionPeriod()));
+        tender.setDate(getDataInfo(detail.getPeriod(), detail.getAuctionPeriod()));
         detail.setId(tenderDetailRepository.findByUniqueId(detail.getUniqueId()).stream().map(TenderDetailDto::getId).findFirst().orElse(null));
         tenderDetailRepository.save(detail.toDto());
         tenderRepository.save(tender);
@@ -136,5 +139,23 @@ public class TenderService {
                 .map(TenderDetailDto::getCategory)
                 .findFirst().orElse(""));
         return result;
+    }
+
+    private String getDataInfo(Period period, LocalDateTime auction){
+        StringBuilder sb = new StringBuilder();
+        if (period != null && period.getEnquiryPeriod() != null){
+            sb.append("Период разъяснений: c ").append(DateUtil.dateTimeToStr(period.getEnquiryPeriod().getStartDate()))
+                    .append(" по ").append(DateUtil.dateTimeToStr(period.getEnquiryPeriod().getEndDate()))
+                    .append("\n");
+        }
+        if (period != null && period.getTenderPeriod() != null){
+            sb.append("Подача предложений: с ").append(DateUtil.dateTimeToStr(period.getTenderPeriod().getStartDate()))
+                    .append(" по ").append(DateUtil.dateTimeToStr(period.getTenderPeriod().getEndDate()))
+                    .append("\n");
+        }
+        if (auction != null){
+            sb.append("Аукцион: ").append(DateUtil.dateTimeToStr(auction)).append("\n");
+        }
+        return sb.toString();
     }
 }

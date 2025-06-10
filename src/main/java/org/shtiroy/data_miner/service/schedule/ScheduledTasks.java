@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 public class ScheduledTasks {
 
-    private final Integer ACHIZITII_UPDATE_PAGE_COUNT = 3;
+    private final Integer ACHIZITII_UPDATE_PAGE_COUNT = 1;
     private final AchizitiiMdParser achizitiiMdParser;
     private final TenderRepository tenderRepository;
     private final TenderService tenderService;
