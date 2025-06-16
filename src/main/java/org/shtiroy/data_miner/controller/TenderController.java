@@ -48,4 +48,10 @@ public class TenderController {
         LOGGER.info("/tender/verify - request | {}", tenderInfo);
         return ResponseEntity.ok(tenderService.updateTenderDetail(Integer.parseInt(tenderInfo)));
     }
+
+    @PostMapping("/tender/docs")
+    public ResponseEntity<Object> tenderDocs(@RequestBody String tenderId){
+        LOGGER.info("/tender/docs - request | {}", tenderId);
+        return ResponseEntity.ok(tenderService.getTenderDocs(tenderId));
+    }
 }

@@ -1,14 +1,12 @@
 package org.shtiroy.data_miner.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.shtiroy.data_miner.entity.TenderDetailDto;
 import org.shtiroy.data_miner.entity.TenderInfo;
 import org.shtiroy.data_miner.exception.ResourceNotFoundException;
-import org.shtiroy.data_miner.model.Period;
-import org.shtiroy.data_miner.model.Tender;
-import org.shtiroy.data_miner.model.TenderDetail;
-import org.shtiroy.data_miner.model.TenderDto;
+import org.shtiroy.data_miner.model.*;
 import org.shtiroy.data_miner.parser.AchizitiiMDDetailParser;
 import org.shtiroy.data_miner.parser.MTenderDetailParser;
 import org.shtiroy.data_miner.repository.TenderDetailRepository;
@@ -16,10 +14,12 @@ import org.shtiroy.data_miner.repository.TenderRepository;
 import org.shtiroy.data_miner.util.Country;
 import org.shtiroy.data_miner.util.DateUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -157,5 +157,18 @@ public class TenderService {
             sb.append("Аукцион: ").append(DateUtil.dateTimeToStr(auction)).append("\n");
         }
         return sb.toString();
+    }
+
+    public List<Document> getTenderDocs(String tenderId){
+        Optional<TenderInfo> tenderInfo = tenderRepository.findById(Integer.parseInt(tenderId));
+        if (tenderInfo.isPresent()){
+            TenderDetailDto tenderDetailDto = tenderDetailRepository.findByUniqueId(tenderInfo.get().getUniqueId()).get(0);
+
+            if (tenderDetailDto != null && StringUtils.hasText(tenderDetailDto.getDocuments())){
+                TenderDetail detail = tenderDetailDto.toModel();
+                return detail.getDocuments();
+            }
+        }
+        return Collections.emptyList();
     }
 }
