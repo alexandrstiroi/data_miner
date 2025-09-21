@@ -41,6 +41,7 @@ public class TenderDetailDto {
     private String period;
     private LocalDateTime auctionPeriod;
     private String documents;
+    private String tenderJson;
 
     public TenderDetail toModel(){
         TenderDetail result = new TenderDetail();
@@ -58,11 +59,15 @@ public class TenderDetailDto {
         try{
             ObjectMapper mapper = JacksonConfig.getObjectMapper();
             List<Lot> list = mapper.readValue(this.lots, mapper.getTypeFactory().constructCollectionType(List.class, Lot.class));
-            Period enquiry = mapper.readValue(this.period, Period.class);
-            List<Document> documentList = mapper.readValue(this.documents, mapper.getTypeFactory().constructCollectionType(List.class, Document.class));
+            if (this.period != null) {
+                Period enquiry = mapper.readValue(this.period, Period.class);
+                result.setPeriod(enquiry);
+            }
+            if (this.documents != null) {
+                List<Document> documentList = mapper.readValue(this.documents, mapper.getTypeFactory().constructCollectionType(List.class, Document.class));
+                result.setDocuments(documentList);
+            }
             result.setLots(list);
-            result.setPeriod(enquiry);
-            result.setDocuments(documentList);
         } catch (JsonProcessingException exception){
             log.error("ошибка парсенга json {}", exception.getMessage());
         }

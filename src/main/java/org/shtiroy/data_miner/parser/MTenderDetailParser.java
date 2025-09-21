@@ -65,6 +65,7 @@ public class MTenderDetailParser implements SiteDetailParse{
                 }
             }
             detail.setUrls(url);
+            detail.setTenderJson(response);
         } catch (WebClientResponseException | JsonProcessingException ex){
             log.error("Ошибка {}", ex.getMessage());
             throw new ParserException("Ошибка парсинга " + ex.getMessage());

@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: v4.0__alter_table_tender_detail
+      author: Shtiroy Aleksandr
+      changes:
+        sqlFile:
+          path: db/changelog/04/v4.0__alter_table_tender_detail.sql

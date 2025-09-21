@@ -30,6 +30,7 @@ public class TenderDetail {
     private Period period;
     private LocalDateTime auctionPeriod;
     private List<Document> documents;
+    private String tenderJson;
 
     public TenderDetailDto toDto(){
         TenderDetailDto result = new TenderDetailDto();
@@ -44,6 +45,7 @@ public class TenderDetail {
         result.setStatus(this.status);
         result.setStatusDetails(this.statusDetails);
         result.setAuctionPeriod(this.auctionPeriod);
+        result.setTenderJson(this.tenderJson);
         try{
             ObjectMapper mapper = JacksonConfig.getObjectMapper();
             result.setLots(mapper.writeValueAsString(this.lots));
